@@ -1,12 +1,17 @@
 #!/bin/bash
 
-yum -y install vim bash-completion net-tools expect git etcd wget
+yum -y install vim bash-completion net-tools expect git  wget lrzsz
 iptables -F && iptables -X
+systemctl stop firewalld.service && systemctl disable firewalld.service
 sed -i "s@SELINUX=enforcing@SELINUX=disabled@g" /etc/selinux/config
 sed -i "s@BOOTPROTO=dhcp@BOOTPROTO=none@g" /etc/sysconfig/network-scripts/ifcfg-ens33
-
-
-
+mkdir -p /var/lib/etcd/default.etcd
+mkdir /etc/etcd/cert -p
+mkdir -p /etc/kubernetes/cert
+mkdir -p /opt/k8s/{work,bin}
+echo "export PATH=$PATH:/opt/k8s/bin" >> ~/.bashrc
+source ~/.bashrc
+wget https://github.com/etcd-io/etcd/releases/download/v3.4.9/etcd-v3.4.9-linux-amd64.tar.gz
 cat >> /etc/hosts << EOF
 192.168.221.155 k8s-master etcd-1
 192.168.221.156 k8s-node1 etcd-2
@@ -40,7 +45,8 @@ NETMASK=255.255.255.0
 GATEWAY=192.168.221.2 
 DNS1=192.168.221.2
 EOF
-
+mkdir -p /etc/cni/net.d
+mkdir -p /opt/cni/bin
 systemctl stop NetworkManager && systemctl disable NetworkManager
 
 elif [ "${node}" == "k8s-node2" ]
@@ -69,6 +75,8 @@ NETMASK=255.255.255.0
 GATEWAY=192.168.221.2 
 DNS1=192.168.221.2
 EOF
+mkdir -p /etc/cni/net.d
+mkdir -p /opt/cni/bin
 
 systemctl stop NetworkManager && systemctl disable NetworkManager
 

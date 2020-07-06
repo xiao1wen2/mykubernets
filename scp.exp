@@ -1,0 +1,34 @@
+#!/usr/bin/expect -f
+#此脚本文件是配合scp.sh脚本文件完成自动批量文件传输，
+#set ip1 "192.168.0.159"
+#set ip1 "192.168.0.160"
+#set ip1 "192.168.0.161"
+#set ip1 "192.168.0.146"
+#set ip1 "192.168.0.147"
+set ip [lindex $argv 0]
+set password "www.123.com"
+
+spawn ssh-copy-id -i /root/.ssh/id_rsa.pub root@$ip
+set timeout 10
+#set timeout 10
+#send "$password\r"
+#set timeout 10
+#send "exit\r"
+#interact
+expect {
+
+"yes/no" { send "yes\r"; exp_continue}
+
+"password:" { send "$password\r" }
+
+}
+
+#expect "]# "
+
+#send "touch a.txt\r"                       #意思为发送命令
+
+#send "exit\r"
+
+expect eof
+
+exit
